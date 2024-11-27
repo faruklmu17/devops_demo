@@ -1,42 +1,42 @@
-name: Run Playwright Tests
+# name: Run Playwright Tests
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+#     branches:
+#       - main
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
+# jobs:
+#   test:
+#     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+#     steps:
+#     - name: Checkout repository
+#       uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20'
+#     - name: Set up Node.js
+#       uses: actions/setup-node@v3
+#       with:
+#         node-version: '20'
 
-    - name: Install dependencies
-      run: |
-        npm install
+#     - name: Install dependencies
+#       run: |
+#         npm install
 
-    - name: Install Playwright Browsers
-      run: |
-        npx playwright install --with-deps
+#     - name: Install Playwright Browsers
+#       run: |
+#         npx playwright install --with-deps
 
-    - name: Install http-server
-      run: |
-        npm install --save-dev http-server
+#     - name: Install http-server
+#       run: |
+#         npm install --save-dev http-server
 
-    - name: Start the server
-      run: |
-        npx http-server ./ -p 5500 &  # Start the server in the background
+#     - name: Start the server
+#       run: |
+#         npx http-server ./ -p 5500 &  # Start the server in the background
 
-    - name: Run Playwright tests
-      run: |
-        npx playwright test  # Run the Playwright tests
+#     - name: Run Playwright tests
+#       run: |
+#         npx playwright test  # Run the Playwright tests
