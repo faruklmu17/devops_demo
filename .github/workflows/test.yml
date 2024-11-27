@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - update_actions  # Trigger on push to the 'update_actions' branch (change to your branch name)
+      - update_actions  # Trigger on push to the 'update_actions' branch
 
 jobs:
   test:
@@ -24,6 +24,13 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps  # Install required Playwright browsers and dependencies
 
+      - name: Install HTTP server
+        run: npm install -g http-server  # Install http-server globally
+
+      - name: Start HTTP server in background
+        run: |
+          nohup http-server ./ -p 5500 &  # Start the server on port 5500 in the background
+
       - name: Run Playwright tests
         run: npx playwright test
 
@@ -35,15 +42,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Checkout the main branch
+        run: git checkout main  # Ensure we are on the main branch for deployment
+
+      - name: Merge update_actions into main
+        run: |
+          git fetch origin update_actions
+          git merge origin/update_actions --no-ff -m "Merge update_actions into main"
+
       - name: Deploy to GitHub Pages
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@users.noreply.github.com"
           git remote add origin https://github.com/${{ github.repository }}.git
           git fetch origin
-          git checkout update_actions
+          git checkout main  # Ensure we are deploying from the main branch
           git add .
           git commit -m "Deploy to GitHub Pages"
-          git push origin update_actions
+          git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
