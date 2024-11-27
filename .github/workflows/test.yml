@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - update_actions  # Trigger on push to the main branch
+      - update_actions  # Trigger on push to the 'update_actions' branch (change to your branch name)
 
 jobs:
   test:
@@ -20,6 +20,9 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps  # Install required Playwright browsers and dependencies
 
       - name: Run Playwright tests
         run: npx playwright test
@@ -38,29 +41,9 @@ jobs:
           git config --global user.email "github-actions@users.noreply.github.com"
           git remote add origin https://github.com/${{ github.repository }}.git
           git fetch origin
-          git checkout main
+          git checkout update_actions
           git add .
           git commit -m "Deploy to GitHub Pages"
-          git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  deploy_fallback:
-    runs-on: ubuntu-latest
-    if: ${{ success() }}  # This job will run if the tests were successful
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Fallback Deploy to GitHub Pages
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@users.noreply.github.com"
-          git remote add origin https://github.com/${{ github.repository }}.git
-          git fetch origin
-          git checkout main
-          git add .
-          git commit -m "Fallback Deploy to GitHub Pages"
-          git push origin main
+          git push origin update_actions
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
