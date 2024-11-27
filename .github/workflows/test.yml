@@ -3,23 +3,32 @@ name: Run Playwright Tests
 on:
   push:
     branches:
-      - main  # Adjust this to your default branch or any other branch
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3  # Ensure this is the latest version
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3  # Ensure this is the latest version
-        with:
-          node-version: '20'  # Set the Node.js version to 20
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'  # Adjust the Node.js version as needed
 
-      - name: Install dependencies
-        run: npm install
+    - name: Install dependencies
+      run: |
+        npm install
 
-      - name: Run Playwright tests
-        run: npx playwright test  # Run the Playwright tests here
+    - name: Install Playwright Browsers
+      run: |
+        npx playwright install --with-deps  # Installs required browsers
+
+    - name: Run Playwright tests
+      run: |
+        npx playwright test  # Run the Playwright tests
