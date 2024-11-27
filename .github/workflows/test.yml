@@ -19,7 +19,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '20'  # Adjust the Node.js version as needed
+        node-version: '20'
 
     - name: Install dependencies
       run: |
@@ -27,7 +27,15 @@ jobs:
 
     - name: Install Playwright Browsers
       run: |
-        npx playwright install --with-deps  # Installs required browsers
+        npx playwright install --with-deps
+
+    - name: Install http-server
+      run: |
+        npm install --save-dev http-server
+
+    - name: Start the server
+      run: |
+        npx http-server ./ -p 5500 &  # Start the server in the background
 
     - name: Run Playwright tests
       run: |
