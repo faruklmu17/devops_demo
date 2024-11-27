@@ -42,15 +42,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Checkout the main branch
+        run: git checkout main  # Ensure we are on the main branch for deployment
+
+      - name: Merge update_actions into main
+        run: |
+          git fetch origin update_actions
+          git merge origin/update_actions --no-ff -m "Merge update_actions into main"
+
+      - name: Set remote URL
+        run: |
+          git remote set-url origin https://github.com/${{ github.repository }}.git
+
       - name: Deploy to GitHub Pages
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@users.noreply.github.com"
-          git remote add origin https://github.com/${{ github.repository }}.git
-          git fetch origin update_actions  # Fetch the update_actions branch
-          git checkout update_actions  # Ensure we're deploying from the update_actions branch
+          git fetch origin
+          git checkout update_actions  # Ensure we are deploying from the update_actions branch
           git add .
           git commit -m "Deploy to GitHub Pages"
-          git push origin update_actions  # Push to the update_actions branch
+          git push origin update_actions
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
