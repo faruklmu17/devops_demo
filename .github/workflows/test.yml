@@ -38,16 +38,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Git
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "github-actions@users.noreply.github.com"
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build the site
+        run: npm run build  # Adjust for your project needs
 
       - name: Deploy to GitHub Pages
         run: |
-          npm run build  # Build the production-ready site (adjust as necessary)
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github-actions@users.noreply.github.com"
           git add -A
           git commit -m "Deploy site to GitHub Pages"
-          git push origin `gh-pages`
+          git push origin gh-pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
