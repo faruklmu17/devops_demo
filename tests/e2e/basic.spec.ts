@@ -18,7 +18,7 @@ test.describe('Signup Page Tests', () => {
     // Check if an error appears or the form doesn't submit
     // Since no error message is defined in the HTML, let's check if the fields are still empty
     const usernameField = await page.locator('input[type="text"]');
-    const passwordField = await page.locator('input[type="password"]');
+    const passwordField = await page.locator('input[type="pas"]');
     await expect(usernameField).toHaveValue('');
     await expect(passwordField).toHaveValue('');
   });
