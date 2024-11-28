@@ -1,78 +1,58 @@
-name: CI/CD Pipeline
+name: Run Playwright Tests and Deploy
 
 on:
   push:
     branches:
       - main  # Trigger on push to the 'main' branch
+  pull_request:
+    branches:
+      - main  # Run tests on pull requests to the 'main' branch
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps  # Install required Playwright browsers and dependencies
-
-      - name: Install HTTP server
-        run: npm install -g http-server  # Install http-server globally
-
-      - name: Start HTTP server in background
         run: |
-          nohup http-server ./ -p 5500 &  # Start the server on port 5500 in the background
+          npm install
+
+      - name: Install Playwright Browsers
+        run: |
+          npx playwright install --with-deps
+
+      - name: Install http-server
+        run: |
+          npm install --save-dev http-server
+
+      - name: Start the server
+        run: |
+          npx http-server ./ -p 5500 &  # Start the server in the background
 
       - name: Run Playwright tests
-        run: npx playwright test
+        run: |
+          npx playwright test  # Run the Playwright tests
 
   deploy:
     runs-on: ubuntu-latest
-    needs: test  # Ensures deployment only happens if tests pass
+    needs: test  # Ensure the deploy job runs only if the test job succeeds
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Ensure main branch
-        run: git checkout main  # Ensure we are on the main branch for deployment
-
-      - name: Configure Git
+      - name: Trigger GitHub Pages Deployment
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@users.noreply.github.com"
+          echo "Tests passed. GitHub Pages auto-deployment will now proceed."
 
-      - name: Check for changes
-        id: check_changes
-        run: |
-          git fetch origin
-          git status
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "changes_detected=true" >> $GITHUB_ENV
-          else
-            echo "changes_detected=false" >> $GITHUB_ENV
-          fi
-
-      - name: Commit and push changes
-        if: env.changes_detected == 'true'
-        run: |
-          git add .
-          git commit -m "Deploy to GitHub Pages"
-          git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Skip deployment (no changes)
-        if: env.changes_detected == 'false'
-        run: echo "No changes to deploy, skipping this step."
 
 
 
