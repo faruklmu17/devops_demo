@@ -1,3 +1,67 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to the 'main' branch
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps  # Install required Playwright browsers and dependencies
+
+      - name: Install HTTP server
+        run: npm install -g http-server  # Install http-server globally
+
+      - name: Start HTTP server in background
+        run: |
+          nohup http-server ./ -p 5500 &  # Start the server on port 5500 in the background
+
+      - name: Run Playwright tests
+        run: npx playwright test
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test  # Ensures deployment only happens if tests pass
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Checkout the main branch
+        run: git checkout main  # Ensure we are on the main branch for deployment
+
+      
+
+      - name: Set remote URL
+        run: |
+          git remote set-url origin https://github.com/${{ github.repository }}.git
+
+      - name: Deploy to GitHub Pages
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@users.noreply.github.com"
+          git fetch origin
+          git checkout main  # Ensure we are deploying from the update_actions branch
+          git add .
+          git commit -m "Deploy to GitHub Pages"
+          git push origin update_actions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
 
