@@ -1,4 +1,4 @@
-name: Run Playwright Tests and Deploy to GitHub Pages
+name: Test Token Permissions
 
 on:
   push:
@@ -13,48 +13,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-
-      - name: Start the server
-        run: npx http-server ./ -p 5500 &
-
-      - name: Run Playwright tests
-        run: npx playwright test
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: test  # Only run if tests pass
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
       - name: Configure Git
         run: |
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Deploy static files to GitHub Pages
+      - name: Create and Push to gh-pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Ensure you are on the gh-pages branch
           git checkout -B gh-pages
-          
-          # Add all necessary files
-          git add .
-          
-          # Commit changes (no error if nothing to commit)
-          git commit -m "Deploy site to GitHub Pages" || echo "Nothing to commit"
-          
-          # Push to gh-pages branch using token for authentication
-          git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} gh-pages
+          touch test-file.txt
+          git add test-file.txt
+          git commit -m "Test push to gh-pages"
+          git push -f https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} gh-pages
