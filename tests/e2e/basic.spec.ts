@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Signup Page Tests', () => {
 
   // Test 1: Check if the Signup button is present
-  test('should have a signup button', async ({ page }) => {
+  test('should have a signup button on the page', async ({ page }) => {
     await page.goto('http://127.0.0.1:5500/index.html');
     const signupButton = await page.locator('input[type="submit"][value="Signup"]');
     await expect(signupButton).toBeVisible();
